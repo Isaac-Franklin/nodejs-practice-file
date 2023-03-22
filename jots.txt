@@ -1,0 +1,484 @@
+REST APIs SHOULD ALWAYS BE STATELESS.
+
+ENVIRONMENTAL VARIABLES IN NODE JS:
+1. DEVELOPMET AND 
+2. PRODUCTION VARIABLE
+Find out what variable upoire in by running: console.log(app.get('env')): can do this in the server file.
+thr production or development variable is set by express. To find out what env variables are set by node js,
+run "console.log(process.env)": these varibles come from the "process core module".
+
+node env: this variable defines whether I am in dev or prod mode, I have to define it myself.
+To change my devleopment mode from development to production, I have to use: 'NODE_ENV=development nodemon server.js'.
+the server.js is the base file for the project, so It is determined by my script setting.
+
+*I can also effect configurations based on my environment through the console, while defining the NODE ENV 
+environmental variable. I can create a new file for doing this is I have a lot of variables to define. 'config.env'.
+*Variable names are usually in uppercase-thats the convention | In the config.env file I can paste in the:
+'NODE_ENV=development', PORT, PASSWORD, USERNAME,  as well as define other variables.
+
+*In order to allow node js to read my env variables in my config.env file. I have to install 'npm i dotenv'.
+
+*the require dotenv in server. Then run dotenv.config({ path: 'define path to config.env file in here' }).
+
+*when I now start the app, the env variables now get saved in node js.
+
+*the files and info in the config.env file has to be set and activated before the app.js file runs. so I 
+should always place the dotenv.config({path : 'file path'})' before the ''const app = require("./app")' 
+file is run. This is because I want to run my configurations before my app runs.
+
+*we can use the if stmt to run a particular command when an environment variable is set to a particular 
+given value.
+
+-------------------------------
+USING ESLINT FOR CODE REVIEW AND CODE ERROR DETECTION:
+ESLint is used to detecting errors in my code. install the following L0CALLY  to get started:
+npm i eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-config-airbnb eslint-plugin-node eslint-plugin-import eslint-plugin-jxs-ally eslint-plugin-react --save-dev
+*eslint-config-prettier  - [prevents eslint from formating code-prettier does this for me]
+*eslint-plugin-prettier - allow eslint to show formatting prettier
+*eslint-config-airbnb- js style guide we are to follow
+*eslint-plugin-node  - node js error detection
+*airbnb dependent packaged: eslint-plugin-import eslint-plugin-jxs-ally eslint-plugin-react
+
+now create eslint and prettier config files : prettier - .prettierrc , eslint - .eslintrc.json
+*now copy the code below and put in the aslintrc.json file:
+**start
+{
+  "extends": ["airbnb", "prettier", "plugin:node/recommended"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "spaced-comment": "off",
+    "no-console": "warn",
+    "consistent-return": "off",
+    "func-names": "off",
+    "object-shorthand": "off",
+    "no-process-exit": "off",
+    "no-param-reassign": "off",
+    "no-return-await": "off",
+    "no-underscore-dangle": "off",
+    "class-methods-use-this": "off",
+    "prefer-destructuring": ["error", { "object": true, "array": false }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }]
+  }
+}
+
+**end
+
+*ALWAYS COPY THE ESLINT DATA AND PUT INTO ANY PACKAGE.JSON FILE FOR A NEW NODE JS 
+PROJECT AND INSTALL, AS WELL AS THE PRETTIERRC FILE
+**************************
+MONGO DB DATABASE SESSION STARTS HERE:
+*MONGO DB IS A NO SQL DATABASE
+*A DATABASE IS MADE UP OF COLLECTIONS, WHICH ARE CALLED TABLES IN RELATIONAL DATABASES
+*COLLECTIONS NOW CONTAIN ONE OR MORE DATA STRUCTURES CALLED DOCUMENTS WHICH ARE REFERRED TO AS A ROW IN A RELATIONAL DB
+*A DOCUMENTS CONTAINS INFO ABOUT ONE SINGLE ENTITY: ONE BLOG POST, ONE USER ETC
+*KEY FEATURES OF MONGO DB:
+A. STORES DATA IN DOCUMENTS AS KEY VALUE PAIR FORMAT-NO SQL
+B. EASY SCALABLE IN CASE OF GROWTH OR PRODUCTION ERROR
+C. BSON: MONGO DB STORES DATA IN THIS FORMAT: THIS IS SIMILAR TO JSON, JUST THAT IT IS TYPED(ALL DOCUMENT IS CLASSIFIED 
+UNDER A DATA TYPE FORMAT)
+D. IT IS HIGHLY PERFORMANT: SHARDING, EMBEDDED DATA MODELS, FLEXIBLE DOCUMENTING, NATIVE DUPLICATION ETC.
+E. FREE AND OPEN SOURCE UNDER THE SSPL LICENSE
+*UNDERSTANDING THE DIFFERENC BETWEEN NORMALIZING AND EMBEDDING OR DE-NORMALIZING: THE ACT OF A DOCUMENT 
+IN A COLLECTION HAVING A SET OF OBJECTS AS A VALUE, A DE-NORMALIZED DB WILL HAVE THESE VALUE ADDED AS A 
+EMBEDDED DOCUMENT, BUT A RELATIONAL DB WILL HAVE TO CREATE A DIFFIRENT TABLE FOR THE EXTRA OBJECTS AND 
+LINK THE TWO RELATED TABLES THROUGH THEIR ID.
+*MAX SIZE OF A BSON FILE IS 16MB AND A UNIQUE ID FOR A COLLECTION IS CREATED AUTOMATICALLY AND IS CALLED THE PRIMARY KEY
+
+*MONGO DB ATLAS: MONGO DB AS A SERVICE, RUNS MONGO DB ON THE WEB
+
+
+
+17-02-2023
+using mongo shell to run Mongo DB FOR COMMANDS BELOW:
+IN MONGO DB THE COMMAND 'show dbs' SHOWS ALL AVAILABLE DATABASES 
+IN MONGO DB THE COMMAND 'show collections' SHOWS ALL AVAILABLE COLLECTIONS 
+use: TO SWITCH TO AN EXISTING DB OR CREATE A NEW DB IF THE SPECIFIED ON DOES NOT EXIST
+
+quit(): TO EXIT MONGO SHELL
+db.collectionName.find(): R
+db.collectionName.find({name:'documentName'}): R
+db.collectionName.insertOne({})
+db.collectionName.insertMany({})
+db.collectionName.updateOne({identifier eg{name: 'documentName', update now eg {$set: {price:  400}}}})
+db.collectionName.updateMany({identifier eg{name: 'documentName', update now eg {$set: {price:  400}}}})
+
+MONGO SHELL AND COMPASS COMMANDS:
+searching for a document using 'project method': this searches for a 
+document considering only one part of the document. and shows the result and the ID.
+
+MONGO DB DRIVER: A SOFTWARE THAT ALLOWS MY NODE CODE TO INTERACT WITH MONGO BD EG: MONGOOSE - npm i mongoose@5
+CONFIGURE MONGO DB IN THE SERVER.JS FILE 
+
+19-02-1023
+SCHEMA = MODEL = DOCUMENT = DATABASE[CRUD]
+
+A schema is created in order to define the necessary data types and rules for creating a model. In a schema we state what 
+kind of data should be accepted in the model and other SCHEMA DATA OPTIONS. example:
+
+const tourSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'A tour must have a name'],
+  },
+  price: Number,
+  rating: {
+    type: Number,
+    default: 4.3,
+    unique: true
+  }
+})
+
+in the schema data options, I can also include a required option if that info in necesary and compulsory.
+I can also include a default value. And in teh required data types, I can also include an error message that shows 
+up when that info is not provided. See above example for all these.
+
+The required[] schema data option is called a VALIDATOR: Since it is used to validate and make sure the
+expected data is provided.
+
+Now to create a model out of the shcema I just created, I state this:
+
+const TourModel = mongoose.model('TourModel', tourSchema);
+
+Now model name is "TourModel": must be a capital T, convensionally.
+
+21-02-2023:
+
+WE HAVE THE:
+SERVER.JS: start server, create schema. Server recieves a req from a user or client
+and attachs a middleware that redirects all requests to respective routers.
+
+APP.JS: Configure express and activate by referencing to app and export app, to use attached methods. Activate necesarry 
+middleware in here too.
+
+ROUTER.JS: Here I activate the router, and redirect every sent in request to a prober handler or controller.
+CONTROLLER.JS: Handle all requests sent in and send necessary res.
+
+
+24-02-2023: CHECK OUT MONGOOSE DOCUMENTATION
+GET REQUEST: TO FIND A SINGLE TOUR, I CAN USE THE ID PARAMETER AND A METHOD: 'findById(req.params.id)'
+or I CAN USE findOne({_id : id}): THIS METHOD IS SIMILAR TO THE ONE USED WHEN USING MONGO DB IN MONGO SHELL.
+TO UPDATE A TOUR, I CAN ALSO USE: findByIdAndUpdate(req.params.id) or findOneAndUpdate({_id : id}): When updating a document,
+I use the first method, findByIdAndUpdate or even findOneAndUpdate, first parameter it takes in is the id, then the req.body,
+whuch is the send data, then an options object follow. In this object I set some properties, eg: 'new : true': this makes sure that
+when a client requests that tour data, the returned data is the updated one and not the old one.We also add the property 
+'runValidators: true', so that when making an update, the mapped out validators in the original TOUR creation fxn runs again now.
+
+ANOTHER SCHEMA DATA OPTION is 'trim: true'. And this applies to schema types of 'string'. It removes white spaces from texts.
+eg: name: {
+  type: String,
+  trim: true
+}
+
+IMAGE TYPE IS A STRING IN MONGODB, COS WE ONLY SAVE THE STRING NAME AND FETCH WITH IT.
+
+26-02-2023
+using './' to start a folder location string when trying to import a fxn from a folder of interatc with another folder,
+it might go wrong because the './' allows node to search from the folder where the node app was actully started, 
+it is more advisable to use the dirname to address the current folder: - `${__dirname}/../../` - and this us availble everywhere.
+
+WRITING A SCRIPT TO CARRY OUT A COMMAND VIA THE COMMAND LINE - A COMMAND LINE APPLICATION:
+SAY I HAVE A FILE WHERE I HAVE SPECIFIED A NUMBER OF FXNS AND I DO NOT CALL ANY AT THE FXN TO EXECUTE WHEN I CALL 
+THE FILE IN N0DE, I CAN SPECIFY A FXN TO RUN USING CMD LINE. TO DO THIS, I HAVE TO USE THE 'process.argv' COMMAND IN CMD LINE.
+
+THE 'PROCESS.ARGV' DISPLAY AN ARRAY OF ARGUMANTS INCLUDED IN RUNNING THE NODE PROCESS. I CAN SPECIFY A THIRD PARAMETER IN THE 
+ARRAY BY ADD '--anyname' to the file execution command. EG: 'node starter/server.js --anyname'. Now the file path for 
+node, started/server.js are members of the array and anyname is included are a third menber of the array. -anyname is a string.
+
+Now I can carry out a particular fxn in that file by specifying what fxn should run when 'anyname' is a particular thing
+in the cmd line. I can say:
+if(process.argv[2] === 'this'){
+    do this();
+    process.exit(); - this exits the cmd phase after executing fxn.
+}. 
+process.argv[2] is the third parameter in the process.argv array as speified by me.
+Doing this I am able to execute fxns at choice through cmd line.
+
+FILTERING: MAKING AN API EASY TO USE:
+using query strings to filter through data in my API.
+what is a query string: '?key=value&key=value' or  '?key[gte]=value&key=value' - a query string starts with a question mark - ? - and comes as a key-value
+pair. If more than one key-value pair is needed to filter data, I can seperate the key-value pairs with a '&'.EG: 
+'api/v1/tours?duration[gte]=4&review[lte]=4.5&time=3'.
+
+when using the filtering method in querying my API, I can use either of the two methods:
+const tours = Tours.find({difficulty: 'easy', level: 5})
+OR
+const tours = Tours.find().where('difficulty').equals('easy').where('level').equals(4).
+
+The query string keywords availble in mongo DB include:
+1. sort
+2. limit
+3. page 
+4. fields 
+5. and all the ones I allow on my API.
+
+To use the quesry string, I have to allow the ones I wand my user or clients to apply to my API and specifically exclude 
+the other ones from working. 
+
+NOTE THAT WITHOUT IMPLEMENTING THE EXECUTION OF THE QUERY STRING, A USE OF QUERY STRING ON THE API WILL NOT WORK.
+
+USING REGULAR EXPRESSION TO FURTHER FILTER AN API IN THE QUERY STRING. 
+I can search through a query string and filter all 'gte, gt,lte,lt' and replace them with '$gte, $gt, $lte, $lt' 
+respectively.
+regular expression: (/\b(gt|gte|lt|lte)\b/g)
+regular expressions start and end with //. as in (/\b(gte 1 gt 1 lt 1 lte )\b/g)
+'\b' and' \'b means the exact same keywords specified within,
+'g' means, unlimited number of occurances of this keywords. Tha means if the keyword appear more than once, it 
+considers it too.
+
+
+27-02-2023:
+SORTING:
+Allows user to sort the sent data based on a query string that can be passed via the url. EG 'sort=price':
+We can sort by ascending or descending order. 
+'sort=prices' [sort = value].
+'sort=-prices' [sort = value]: This sorts the result in descending order.
+
+if(req.query.sort){
+  query = query.sort(req.query.sort)
+}
+
+TO SORT BY MORE THAN ONE PARAMETER AT SAME TIME, I CNA SEPERATE THE NAME OF VALUES TO SORT BY A COMMA, EG:
+'api/v1/tours/?sort=price,rating'.
+in the backend, we now have to validate sorting with more than value.
+
+if(req.query.sort){
+  query = query.sort(query)
+  query = query.sort.split(',').join(' ')
+}
+
+const queryString = {...req.query}
+const excludeQueryString = [limit, sort]
+queryString.foreach(element => delete queryString[element])
+COMPLEX FILTERING OF QUERY String
+
+Const newQueryString = queryString.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`)
+// tours.find(queryString)
+
+SORTING REVISION: 
+THE OPERATION OF SELECTING CERTAIN FIELD NAMES IS CALLED 'PROJECTING'
+
+USING THE 'AGGREGATION PIPELINE' IN MONGO DB TO CARRYOUT CALCULATIONS WITH CLIENT-SENT DATA:
+this is a feature provided by mongo db that we can operate through mongoose: using this feature we can manipulate data. 
+Carry out calculations, averages and stuff like that on req data before a response is sent back to the user.
+In the aggregator method which is under a function and stored in a variable in the fxn, I pass in an array of OBJECTS
+which are refered to as 'STAGES'. These are stages that the req.body have to pass through to get the targeted value.
+these array of objects are 'stages', I can find these aggregator operators in the mongo db documentation.
+def Fxn = (req, res) => {
+  const sortings = await TourModel.aggregate = ([{
+     $match : {},
+     {$group: {
+      //first specify the grouping parameter. To address all documents, I specify id as 'null'
+      _id: null,
+
+     }},
+  }])
+}
+
+SOME other kind of operators we can find in mongo db: 
+-$ne : not equal to
+-$avg: averages
+-$min: minimum
+-$max: maximum
+-$sum: sum
+-$unwind: deconstructs an array in a document to return with each instance of that document per paramter in the specified
+array. Eg: if array has three arguments in a document, document will return thrice each with one argument.
+-$match: used to select documents and return. Just like a get query.
+*READ EXTENSIVELY ON AGGREGATOR PIPELINE OPERATORS VIA THE DOCUMENTATION.
+We have aggregate operators and aggregator stages.
+
+//VIRTUAL PROPERTIES: PROPERTIES THAT ARE DEFINED IN MY API BUT ARE NOT STORED IN MY ARRAY. SO THEY ARE DERIVED FROM 
+MANIPULATING DATA THAT ARE STORED IN THE ARRAY AND RETURN DISTINCTLY AS A PART OF THE API.
+THIS CAN BE RETURNING AN ARRAR OF DATA IN WEEKS WHEN WE HAVE A PART OF THE DOCUMENT THAT IS STORED IN DAYS.
+schemaName.virtual('nameOfParamater).get(function(){
+  return this.duration / 7;
+})
+
+
+USING MIDDLEWARE IN MONGO DB:
+The mongoose middleware is also called  pre and post hooks. Because we can define function to run before and after events.
+Events like saving data to the database. There are 4 type of middleware in moongoose:
+1. document: can act on currently processed document(runs on save and create actions on the db. Do not run on insertMany(), findOneAndUpdate())
+2. query: allows the running of functions before or after a query is executed
+3. aggregate, and
+4. model middleware
+
+WE CALL THE 'SAVE' IN PRE-SAVE MIDDLEWARE: A HOOK. SO WE CAN ALSO CALL THE PRE-SAVE MIDDLEWARE A 'PRE-SAVE HOOK'. SAME 
+APPLIES TO THE POST-SAVE MIDDLEWARE.
+-We can have multiple pre-save hook middlewares and post-save hook middlewares.
+schemaName.pre('save, function(next){
+  this.slug = slugify(this.name, {lower: true})
+  next();
+})
+
+THE DOCUMENT MIDDLEWARE ON MONGOOSE RUNS WITH save hook and create hook.
+
+NOTE: In a post-save hook middleware, I do not have access to the this fxn beacuse the data has already been submitted,
+I can access the submitted data using a denoted keyword via the fxn.
+schemaName.post('save', function(savedData, next){
+  console.log(savedData)
+  next();
+})
+
+QUERY MIDDLEWARE: EXECUTING FXNS BEFORE AND AFTER QUERIES ARE RUN. basically runs with a 'FIND HOOK': the this keyword here
+point to the query and not the document.
+The query middleware or find-hook middleware will also be used to add a particular query to the url before the req is 
+executed.
+
+schemaName.pre('find', function (next) {
+  this.find({ secretTour : {$ne : true} })
+  next();
+})
+
+In regular expression, when I want to targget a set of similar keywords athta start or end with a set of words, I can use it. 
+say to carry out a query find hook parameter for all find related requests: find, findOne, findOneAndUpdated.  can use 
+a regular expression thatbtargets everything that starts with 'find'. Like this:
+tourSchemaName.pre(/^find/, function (next){
+  this.find({secretTour : { $ne : true}})
+  next()
+})
+
+We also have the post query middelware that runs after the query has been executed. 
+schemaName.post(/^find/, function (savedData, next){
+  console.log(savedData)
+  next()
+})
+
+Aggregation Middleware:
+This allows the execution of a fxn as a middleware before and after an aggregation happens.
+
+
+MODEL VALIDATION AND SANITIZATION IN MONGOOSE:
+VALIDATION: MEANS MAKING SURE THAT THE DATA ARE IN RIGHT FORMAT AND VALIUES EXIST.
+SANITIZATION: MEANS INPUTED DATA IS CLEAN AND NO MALICIOUS CODE IS ENTERED.
+
+MODEL VALIDATION: We carry out validation on the model because of the FAT MODEL THIN CONTROLLER PRINCIPLE, and express
+provides some functionalities that are available to us in the model stage. Required is a validator, unique is not a validation.
+Other validators are:
+1. maxlength: Maps a maximum length and can only be used on a string data type.
+2. minlength
+maxlength: [40, 'Tour name must have less or equal to 40 characters]
+minlength: [10, 'Tour name must have more or equal to 10 characters]
+3. min: This applies to numbers. Determines what the minimum number should be. Also works with date.
+4. max: This applies to numbers. Determines what the maximum number should be. Also works with date.
+5. enum: used to pass in an array of allowed string values for a section in a schema. So we put this array into
+an object, and also specify the validation error message in the object. Example:
+enum: {
+  values: ['easy', 'difficulty', 'medium']
+  message: "This must have a value of any of these 'easy', 'difficulty', 'medium'"
+}
+
+CUSTOM VALIDATORS IN MONGO DB: THESE ONES RETURN TRUE OR FALSE ONLY.
+
+
+PASSWORD ENCRYPTION PROCEDURE:
+Password hashing using bcrypt.
+bcrypt adds a random string to the password so that two cannot be the same, this is called salting.
+bcrypt first salts the password before hashing it. This makes it very effective and a strong of hashing. 
+Do more research on this: bcrypt.js.
+
+14-03-2023:
+//AN INSTANCE METHOD: A METHOD THAT WILL BE AVAILBLE IN ALL DOCUMENTS OF A PARTICULAR COLLECTION.
+CREATED IN THE MODULE FILE, ALOG SIDE THE SCHEMA. Returns true if passwords are same and false if not.
+Here I will use the 'compare function method that comes with the bcrypt package, this is in a bid to dehash the 
+password and check if entered password is correct. UserModel.method.methodName = async function(hashedPwd, userPwd){
+  return await bcrypt.compare(hashedPwd, userPwd)
+}
+
+ - COMPARE return either trur or false. TRUE id data match abd false if otherwise.
+
+WHEN VALIDATION USER LOGIN, DO NOT SAY 'PASSWORD INCORRECT OR EMAIL INCORRECT', I'LL UST SAY 'Incorrect password of email'.
+This confuses any potential hacker from knowing which data exactly is incorrect.
+
+We can promisify a function in node js my using a built-in package called 'util'. This is an object that has a method
+in it called promisify which chaned an expression to a promise. 
+> const util = require('util)
+
+JWT TOKEN EXPIRATION TIMING:
+You can set expire time in number or string :
+
+expressed in seconds or a string describing a time span zeit/ms.
+Eg: 60, "2 days", "10h", "7d".
+
+A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc),
+otherwise milliseconds unit is used by default ("120" is equal to "120ms").
+
+ var token = jwt.sign({email_id:'123@gmail.com'}, "Stack", {
+        expiresIn: "10h" // it will be expired after 10 hours
+        //expiresIn: "20d" // it will be expired after 20 days
+        //expiresIn: 120 // it will be expired after 120ms
+        //expiresIn: "120s" // it will be expired after 120s
+ });
+
+>19-03-2023
+{ValidateBeforeSave : false}; - this is referenced when I wand to save a document to the DB but some required field
+(according to my stipulated validation) are not included. I should reference this to deactivate the validation parameters.
+
+SENDING EMAILS USING NODE JS: I use a third party package called: NODEMAILER: npm i nodemailer.
+create a separate file under util folder for handling all email feature in the app.
+>User mailtrap.io to send test development emails when developing an app.
+
+IMPPORTANT: WE ALWAYS USE UPDATE FOR APP FEATURES WHEN UPDATING DATA TO THE DB, BUT WITH ANY FEATURE THAT APPLIES TO UPDATING
+A USER DATA, WE USE SAVE (AS IN DATA.SAVE()). THIS IS BECAUSE WE WANT TO RUN ALL MIDDLEWARE OVER AGAIN BEFORE saving
+DATA TO DB FOR SANITIZATION AND VALIDATION PURPOSES.
+
+DELETING A USER 
+To delete a user, or to allow a user the ability to delete his/her account, I have to deactivate it, and not properly 
+erase it from thr records. I can have  a sectionn in the db that shows 'activte:true' or 'active:false' or 
+'active : {$ne: true}
+
+COOKIES:
+A cookie is a piece of text that a server sends to a client, and for everytime the cleint send a request to the server,
+it goes along with the cookie.
+
+SENDING A COOKIE PROPER:
+res.cookie(('jwt)', token, {
+  expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+  secure: true,
+  httpOnly: true
+})
+
+
+SETTING DATES:
+If a particular parameter is to expire in three days, to set it in Javascript, I use the method:
+const activationDate = new Date(Date.now() + 3)
+to put it in milliseconds:
+const activationDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+
+
+IMPLEMENTING RATE LIMITING. THIS CONSIDERS THE NUMBER OF REQUESTS A CLIENTS DEND VIA AN IP ADDRESS, IF IT IS TOO MUCH,
+THE RATE LIMITER BLOCKS THE REQUESTS:
+I will use an npm package called express-rate-limit for this: 'npm i express-rate-limit'
+To activate this I need to first create a limiter  GLOBAL MIDDLEWARE :
+
+const rateLimit = require('express-rate-limit)
+
+const limiter = rateLimit({
+  in here I specify the following: 
+  1. number of requests to be allowed in a given time: max (maximum number of requests).
+  max: 100,
+  2. the time given for a set of requests: windowMs - millisecond(Ms).
+  windowMs: 1 * 60 * 60 * 1000,
+  3. error message to send after limit is reached
+  message: "Request limit reached, try again after an hour"
+})
+IMPLEMENTATION BELOW:
+app.use('/app', 'limiter')
+
+SETTING HEADERS:
+I use an npm package called 'helmet': npm i helmet. 
+
+
+SECURITY PROCEDURE TO PREVENT NOSQL QUERY INJECTIONS: This means a kind of query that NOSQL databases are 
+vulnerable to. The databases include those developed using mongo db as a db. Because it stores data in a key-value pair
+format, unlike django's sql db which stores in a tabular format.
+
+using email: {$gt : "}
+password: 'real password'
+the above details log you in to a production app as an admin. This logs on in because '{$gt : "}' will always be true.
+To prevent these vulnerability, and also XSS protection, I use the following npm packages:
+1. npm install express-mongo-sanitize: checks route, req.params and body to eliminate all injection is seen.
+2. npm install xss-clean: checks user input and cleans malicious code- this xss converts all html symbols to representative
+texts and saves parameter as a string.
+
+PREVENTING PARAMETER POLUTION:
