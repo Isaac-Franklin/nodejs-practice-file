@@ -482,3 +482,4 @@ To prevent these vulnerability, and also XSS protection, I use the following npm
 texts and saves parameter as a string.
 
 PREVENTING PARAMETER POLUTION:
+1. using an npm package to remove deplicate fields: 'npm i hpp'. - hpp: http parameter pollution.
