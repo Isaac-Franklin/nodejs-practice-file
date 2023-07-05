@@ -1,7 +1,7 @@
 const fs = require('fs');
 // const TourModel = require('./controller/tourController')
 const TourModel = require(`${__dirname}/module/tourModule`)
-const allFilesData = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8'))
+const allFilesData = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours.json`, 'utf-8'))
 
 
 
@@ -13,7 +13,6 @@ const addData = async () => {
         console.log(err.message)
     }
 }
-
 
 if (process.argv[2] === '--anyname'){
     addData()

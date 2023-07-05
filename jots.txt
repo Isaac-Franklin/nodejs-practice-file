@@ -151,7 +151,8 @@ and attachs a middleware that redirects all requests to respective routers.
 APP.JS: Configure express and activate by referencing to app and export app, to use attached methods. Activate necesarry 
 middleware in here too.
 
-ROUTER.JS: Here I activate the router, and redirect every sent in request to a prober handler or controller.
+ROUTER.JS: Here I activate the router, and redirect every sent in request to a proper handler or controller.
+
 CONTROLLER.JS: Handle all requests sent in and send necessary res.
 
 
@@ -160,7 +161,7 @@ GET REQUEST: TO FIND A SINGLE TOUR, I CAN USE THE ID PARAMETER AND A METHOD: 'fi
 or I CAN USE findOne({_id : id}): THIS METHOD IS SIMILAR TO THE ONE USED WHEN USING MONGO DB IN MONGO SHELL.
 TO UPDATE A TOUR, I CAN ALSO USE: findByIdAndUpdate(req.params.id) or findOneAndUpdate({_id : id}): When updating a document,
 I use the first method, findByIdAndUpdate or even findOneAndUpdate, first parameter it takes in is the id, then the req.body,
-whuch is the send data, then an options object follow. In this object I set some properties, eg: 'new : true': this makes sure that
+which is the send data, then an options object follow. In this object I set some properties, eg: 'new : true': this makes sure that
 when a client requests that tour data, the returned data is the updated one and not the old one.We also add the property 
 'runValidators: true', so that when making an update, the mapped out validators in the original TOUR creation fxn runs again now.
 
@@ -313,7 +314,7 @@ schemaName.pre('save, function(next){
 
 THE DOCUMENT MIDDLEWARE ON MONGOOSE RUNS WITH save hook and create hook.
 
-NOTE: In a post-save hook middleware, I do not have access to the this fxn beacuse the data has already been submitted,
+NOTE: In a post-save hook middleware, I do not have access to the 'this' fxn beacuse the data has already been submitted,
 I can access the submitted data using a denoted keyword via the fxn.
 schemaName.post('save', function(savedData, next){
   console.log(savedData)
@@ -329,8 +330,12 @@ schemaName.pre('find', function (next) {
   this.find({ secretTour : {$ne : true} })
   next();
 })
+schemaName.pre(/^find/, function (next) {
+  this.find({ secretTour : {$ne : true} })
+  next();
+})
 
-In regular expression, when I want to targget a set of similar keywords athta start or end with a set of words, I can use it. 
+In regular expression, when I want to targget a set of similar keywords that start or end with a set of words, I can use it. 
 say to carry out a query find hook parameter for all find related requests: find, findOne, findOneAndUpdated.  can use 
 a regular expression thatbtargets everything that starts with 'find'. Like this:
 tourSchemaName.pre(/^find/, function (next){
@@ -481,4 +486,361 @@ To prevent these vulnerability, and also XSS protection, I use the following npm
 2. npm install xss-clean: checks user input and cleans malicious code- this xss converts all html symbols to representative
 texts and saves parameter as a string.
 
-PREVENTING PARAMETER POLUTION:
+PREVENTING PARAMETER POLLUTION:
+1. using an npm package to remove duplicate fields: 'npm i hpp'. - hpp: http parameter pollution.
+app.use(hpp({
+  whitelist: ['duration']
+}))
+
+DATA MODELING IN NODEJS:
+Data modeling in backend Development is a big deal, it plays a very extensive role on how we develop the backend of
+the app. Data modeling has to do with the constructive partern with which we parter data and data relationships in the
+app. Data modeling has different methods baased on data relationships:
+1. one to one relationship: one to few, one to many, one to ton.
+2. one to many relationship.
+3. many to many relationship: Two way referencing. 
+
+Types of data modeling methods can also be distinguished by the data formatting:
+1. Referencing/normalized method: This methods has to do with the regular methods of distributing data where every attribute
+has their own schema and are related with each other by the use of their ID. So you can link a child to a parent using the
+child ID. With this method, you need multiple calls to the db to get all required info.
+
+type: mongoose.Schema,ObjectId = means type should be a mongo db id.
+ref: relatedModelName
+
+
+guides: [
+  {
+    type: mongoose.Schema.ObjectId,
+    ref: User
+  }
+]
+
+
+2. Embedded/denormalized method: This method is unique to NoSQL databases, where the child is listed in the parent 
+document entirely. In this method, a single call to the DB provides all needed and related info. 
+in Embedding method or denormalization method, in the schema of the model I am to emned the data, I'll state the name
+of the section of the table as an array. As below:
+eg: guides: Array.
+
+
+then I can create a pre save query that effects the denormalization of the data. as shown below:
+saveDenormalizedData.pre('save', function(next) {
+  const guidePromise = this.guides.map(async id => await User.findById(id))
+  this.guides = promise.all(guidePromise);
+  next();
+})
+
+
+ 
+
+
+Factors to consider when considering a data modeling method to apply:
+1. Relationship type.
+2. Data access method.
+3. Data closeness.
+
+GEOSPATIAL DATA MODELING:
+In order for a data type to be seen as a Geospatial data, I need to specify the 'type' and 'coordinate'.
+const nameSchema = new mongoose.Schema({
+  type : { 
+    type: String,
+    default: 'point'
+  },
+  cordinate: [Number]
+})
+
+LATITUDE: HORIZONTAL
+LONGITUDE: VERTICAL
+In representing a location using GeoJSON, we denote the longitude first and then the latitude. [longitude, latitude]. 
+On any normal use of these measurement format, latitude would come first, but for GeoJSON, longitude leads.
+
+
+
+Embedding data in a document database modeling format: In doing this, we put the child domain directly into The
+parent document. In the schema, the child type is denoted as well as other parameter. 
+
+To embed a document into another 
+as in denormlized data modeling method, the schema section for the data to embed has to be an array, containing an object
+that denotes the document details(type and ref).
+EXAMPLE BELOW: 
+guides: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'modelName'
+        }
+    ]
+
+
+POPULATING: THIS IS A METHOD OF GETTING THE REFERENCED DATA ID FROM AN ID WHEN THE PARENT CONTAINING DATA IS CALLED.
+WE DO THIS IN THE FIND QUERY FXN. WHEN THE DATA IS REQUESTED, I AM TO ADD A METHOD TO THE QUERY PARAMETER AS SO:
+
+I CAN ALSO AND MORE PREFERABLY, EFFECT THENPOPULATING FXN IN THE MODEL QUERY MIDDLEWARE SECTION. THIS IS DONE ON THE SAME
+PAGE AS THE MODULE SO THAT ANY REQUEST SENT TO THE MODEL THAT TRIGGERS A FIND QUERY, THE DATA POPULATES AUTHOMATICALLY
+USING THE QUERY MIDDLEWARE.
+
+const tour = await Tours.findById(id).populate('nameOfTableToPopulate')
+
+AS QUERY MIDDLEWARE: - A PRE-FIND HOOK:
+reviewModelCreate.pre(/^find/, function(next){
+    this.populate({
+        path: 'user',
+        select: 'name'
+    }).populate({
+        path: 'tour',
+        select: 'name'
+    })
+
+    next()
+})
+
+
+----------------------------------------------------------------
+
+LEARN NODE JS IN ONE DAY:
+Promises: A promise is an enhancement for a callback functions. A promise comes in handy when I have to next multiple callback functions.
+The main concept of a promise over a normal callback fxn is the return value that is then consumed by a .then method and either the promise
+is fullfilled or rejected. 
+
+I PROMISIFY a callback function so that it returns a value. The BLUEBIRD library in JS is used to promisify callback fxns.
+I use the bluebird npm package to promisify a whole module so that the module runs asynchronus and creates an async method
+of all the methods the module provides.
+
+var Promise = require('bluebird');
+var mongoClient = Promise.promisifyAll(require('mongodb')).MongoClient;
+var url = 'mongodb://localhost/EmployeeDB';
+mongoClient.connectAsync('mongodb://localhost/EmployeeDB')
+.then(function(db) {
+return db.collection('Employee').findAsync({})
+})
+.then(function(cursor) {
+cursor.each(function(err, doc) {
+console.log(doc);
+})
+});
+
+
+-npm install bluebird
+const promise = requires bluebird()
+const mongoose = promise.pr0misifyAll(require("mongodb"));
+
+
+DENODEIFY:
+Creating custom promises using the 'q' package.
+The 'q' package calls the denodeify method which makes sure that all functions is promisifies and returns a value.
+
+var Q= require('q');
+function Add() {
+var a, b, c;
+a=5;b=6;
+c=a+b;
+}
+var Display_promise= Q.denodeify(Add);
+var promise=Add;
+promise.then
+{console.log("Addition function complete");}
+
+-npm install q
+
+GENERATORS:
+Generators are function executions that can be suspended and resumes at a later point. This is best when trying to
+implement lazy loading. I can pause a function execution and resume at will and gain access to any return value of someyhinh.
+
+YIELD AND NEXT METHODS: Yield method is used when I want to pause a certain function and NEXT method is when
+I want to resume a function that was earlier yeilded.
+
+function* Add(x) {
+yield x + 1;
+var y = yield(null);
+y = 6
+return x + y;
+}
+var gen = Add(5);
+gen.next();
+gen.next();
+
+NOTE: The first step is to define our generator "function" as above. Note that this is done by adding a "*"
+to the function keyword.
+
+Filestreams or STREAMS: Node JS is delivers data to the client in streams mechanism.
+
+PIPES:
+Streams can be piped together using a method called pipe(). Requirement is a writeable stream and an object for 
+passing in options.
+
+ENENTS:
+Event driven programming is to create functions that will be triggered when specific events are triggered.
+
+OR: ||
+
+
+VIRTUAL PROPERTIES:
+The code below makes sure that when their are virtual properties in a document, that the also display in JSON and OBJECT 
+format along side a request:
+{
+  toJSON : {virtuals : true},
+  toObject : {virtuals : true}
+}
+A VIRUAL PROPERTY: A field that is not stored in the DB but calculated using some other value.
+
+VIRTUAL POPULATE:
+With virtual populate: I can indicate a child of a document that is created having a parent referencing method. Such that
+the parent does not know that the child is existent, but this can be changed using the virtual populate method.
+
+
+DIFFERENCE BETWEEN CHILD REFERENCING METHOD AND PARENT REFERENCING METHOD IN PRACTICAL DISPLAY:
+In parent referencing, the key is the name we wish to allocated but conventionally, I would use the name of the
+module in intent to reference. And the value will come as an object in curly brackets.
+
+In child referencing, the key is the name of the module conventionally or any name of choice, and the value comes as an
+array in square brackets that then contains curly brackets which now references the type and ref attributes as required.
+
+
+
+INDEXES IN NODE JS:
+
+SERVER AND CLIENTS SIDE RENDERING:
+I can use any templating engine with Express: Eg: PUG, EJS etc.
+-Setting up PUG in express:
+In app.js, same place where I activated express and have most of my serity middelware functions going on, I will have to
+set up PUG in this section. I will enter the code below:
+
+app.use('view engine', 'pug')
+
+No need to install or require pug as express does all that already.
+Now define where views are located in my project:
+This will be in a folder in my project called 'views'
+
+Now this views folder will contain the view docs just as I have the controller and models(not modules) folders for the
+MVC achitecture. 
+
+path is a built in query model used to manipulate path names.
+const path = require('path');
+defining the views:
+app.set('views', path.join('_dirname, 'views'))
+The above setup now checks the current directory name and find the folder or file called 'path' and refers to it.
+I use the path.join() function because the path name might have a / or not, so the path.join function now solves
+that bug.
+
+PUG: Pug is a white-space sensitive syntax for writing HTML. 
+
+in pug we have a buffet code and an unbuffet code; buffet code are code that collect from the local on the request function
+or code that references data from the request function. This data can be sent like this:
+h1= VariableName
+h2= VariableName.toUpperCase()
+
+>Writing javascript in PUG is also possible.
+
+Unbuffet code: these are code written in PUG that cannot be seen on the FE or client side. I can write this like this:
+- write unbuffet code here. 
+
+CLASS IN PUG:
+convensionally, a class in pug is denoted by a full stop sign (.), but this can also be represented with the word 'class' 
+in required use cases. the class will be within the bracket of the target element.
+
+to add intentation I can use // but this one will be visible on the client side when you access the developers section
+on the client side, to make it invincible there, I can :
+//- write and this wont show in client side developer section.
+
+-interpolation (looks like es6 method -${}): This is another method of writing code in PUG.
+In this method I use #
+In this method I use # to reference local data sent from req - res function and display then on the template.
+
+--
+I can write JS in pug as well, but that method isnt very relicable except for minor js functionalities like checking
+if a a 'res.locals' element is 'true' of 'false'. EG:
+
+if cookie
+  doThis
+else doThisInstead
+
+-30-06-2023 -LINKING TEMPLATES IN PUG USING THE 'includes' KEY WORD:
+I can create specific files for different section of my website or web app and have them linked together on one
+template by using the 'include' keyword.
+
+eg: I can have a header and footer specific page created as '_header.pug' and '_footer.pug'. then I can link both in one
+central page by writing 'include _header' and'include _footer'.
+
+The 'extends' method is also a method of adding a template into another by parent referencing method. Recall that the includes method
+is a child referencing method where the parent references the child or sub-section. But 'extends' method allows a child to 
+reference the parent, along side other siblings that are referenced in the parent template.
+
+
+03_07_2023:
+-We need to have the 'next' keyword after 'req, res' in the parameters of a catchAsync function for it to worrk, like this:
+'catchAsync(async(req, res))'.
+
+
+04-07-2023
+'mixin' in pug: Mixins are pieces of reuseable code that we can pass arguments into. A mixin is written outside the 
+body of the file, at the top, mostly before the start of the main block content. A mixin can also be written in another
+file and then imported into the use file. To use a mixin, I pick the name and implement in the position where I want it to,
+but I have to start a mixin with a plus sign(+) then fill in the arguments necesarry, eg:
+
+mixin overview(a,b,c)
+  overview-box__detail
+    svg.overview-box__icon
+        use(xlink:href=`/img/icons.svg#icon-${a}`)
+    span.overview-box__label b 
+    span.overview-box__text 10 c
+
+using a mixing:
+
++overview(detail, desription, calendar).
+
+------------------------
+> Looping in PUG
+like this:
+each tour in tour
+  loop this text
+
+
+Note that a unbuffet can also take in more than one character. The first represents that loop character, the second
+represents the index of the loop character. Example: 
+-each tour, i in tours
+  do this
+
+> here tour is the loop character and i in the index of the present character in loop.
+
+
+INTEGRATING A MAP USING MAPBOX TOOL:
+Mapbox is a js, frontend tool for creating maps. I'll have to create a js file called "mapbox.js" in the js folder in the
+public folder(where all scripts are kept and displayed from). 
+Now to link a js file like mapbox.js, onto a file, I have to append or preppend. This adds the filled in text to either the end or
+the beginning of the referenced file.
+
+block append header
+  script(src='/js/mapbox.js')
+
+A data attribute that I can specify in html and read it in javascript very easily: I say 'data-name'. the 'name' can be 
+anything of my choosing.
+
+to disble eslint for a certain file, I should enter this code at the top of the file: /*eslint-disable*/
+
+To mak ea particular variable or element visible on all pages in the pug files, I use 'res.locals.name = ElToMakeAvailable'.
+the 'name' can be written as anything. and the 'ElToMakeAvailable' is the actual data I want tp make available on all pugd.
+
+05-07-2023:
+bundler to use in development include webpack, parcel etc. Webpack requires a bunch of configurations while parcel 
+allows no or minimal configurations. So parcel is more recommended than webpack.
+Installation: 'npm i parcel-bundler --save-dev'
+
+to use {login} as in "import {login} from './...'" method to make importation from another file and use in a current file, I'll have to export that function
+by using 'export' that is for module method in JS FE. But is ES Module method, I'll have to use exports.login = () ...
+
+To make all JS recent feature work in my browser, I can use '@babel/polyfill'. this is always included in the final
+bundler, and it helps polyfill js in bundle. To install polyfill, I user 'npm i @babel/polyfill'. To implement polyfill
+in file, I use 'import @babel/polyfill'. 
+
+When compiling with parcel, I get to denote an entry point(conventional: index.js) and a place to save the compiled result
+(conventional: bundle.js). The index.js works as a route file to other js files, so it basically imports active functions
+from other files and create a command that calls these functions.
+
+
+
+
+
+
+
+
+

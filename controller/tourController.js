@@ -1,11 +1,11 @@
-const TourModel = require(`${__dirname}/../module/tourModule`)
-const { promisify } = require('util')
-const jwt = require('jsonwebtoken')
-const {secretKey} = require('./userAuthController')
-const User = require('./../module/userModel')
+import TourModel from '../module/tourModule.js'
+import { promisify } from 'util'
+import jwt from 'jsonwebtoken'
+import secretKey from './userAuthController.js'
+import User from '../module/userModel.js'
 
 
-exports.createTour = async (req, res) => {
+const createTour = async (req, res) => {
     try{
         // const token = await jwt.sign({id: TourModel._id}, secretKey, {
         //     expiresIn: 2000
@@ -89,7 +89,7 @@ class QueryStringFxn {
 }
 
 // VERIFY TOKEN MIDDLEWARE BEFORE FETCHING DATA
-exports.VerifyUser = async (req, res, next) => {
+const VerifyUser = async (req, res, next) => {
     try{
         // check if header exits and if token is there
         if(!req.headers.authorization || !req.headers.authorization.startsWith('Bearer')) throw new Error('Token missing in header!')
@@ -119,11 +119,11 @@ exports.VerifyUser = async (req, res, next) => {
 
 
 // GET ALL TOURS
-exports.getTours = async (req, res) => {
+const getTours = async (req, res) => {
     try{
         // const Features = new QueryStringFxn(TourModel.find(), req.query).filtering().complexFilter().sortQuery().fieldsQuery().pageQuery()
-        // const Features = new QueryStringFxn(TourModel.find(), req.query).filtering().sortQuery().fieldsQuery().pageQuery()
-        const Features = new QueryStringFxn(TourModel.find(), req.query)
+        const Features = new QueryStringFxn(TourModel.find(), req.query).filtering().sortQuery().fieldsQuery().pageQuery()
+        // const Features = new QueryStringFxn(TourModel.find(), req.query)
         let query1 = await Features.query
         const allTours = await query1
         res.status(200).json({
@@ -142,7 +142,7 @@ exports.getTours = async (req, res) => {
 }
 
 // GET SINGLE TOUR
-exports.getTour = async (req, res) => {
+const getTour = async (req, res) => {
     try{
         const id = req.params.id;
         const Tour = await TourModel.findOne({_id : id})
@@ -162,7 +162,7 @@ exports.getTour = async (req, res) => {
 
 // updateTour
 
-exports.updateTour = async (req, res) => {
+const updateTour = async (req, res) => {
     try{
         const tour = await TourModel.findOneAndUpdate(req.params.id, req.body, {
             new: true,
@@ -185,7 +185,8 @@ exports.updateTour = async (req, res) => {
 
 // verify user middleware before delete tour
 
-exports.VerifyUserStatus = (...roles) => {
+
+const VerifyUserStatus = (...roles) => {
     return (req, res, next) => {
     try{
             if(!roles.includes(req.user.role)) throw new Error('You do not have permission to delete this tour')
@@ -204,9 +205,9 @@ exports.VerifyUserStatus = (...roles) => {
 
 // deleteTour
 
-exports.deleteTour = async (req, res) => {
+const deleteTour = async (req, res) => {
     try{
-        const tour = await TourModel.findOneAndDelete({_id : req.params.id})
+        await TourModel.findOneAndDelete({_id : req.params.id})
         res.status(200).json({
             status: 'success',
             message: 'Tour successfully deleted'
@@ -221,7 +222,7 @@ exports.deleteTour = async (req, res) => {
 
 // DELETE ALL DOCUMENTS IN THE COLLECTION
 
-exports.deleteAll = async (req, res) => {
+const deleteAll = async (req, res) => {
     try{
         // await TourModel.findOneAndDelete();
         await TourModel.deleteMany();
@@ -240,7 +241,7 @@ exports.deleteAll = async (req, res) => {
 
 
 // GET TOP FIVE CHEAP, BEST TOURS FOR CLIENT
-exports.cheapTours = async (req, res) => {
+const cheapTours = async (req, res) => {
     try{
         let tours = await TourModel.find({rating: {$gte : 3}, price: {$lt : '300'}})
         res.status(200).json({
@@ -261,7 +262,7 @@ exports.cheapTours = async (req, res) => {
 
 
 // CREATING AN AGGREGATOR PIPELINE
-exports.AggregateQuery = async (req, res) => {
+const AggregateQuery = async (req, res) => {
     const givenYear = req.params.year * 1;
     try{
         let saveData = await TourModel.aggregate([
@@ -307,6 +308,10 @@ exports.AggregateQuery = async (req, res) => {
             // message: err.message
         })
     }
+}
+
+export default {
+    createTour, VerifyUser, getTours, getTour, updateTour, VerifyUserStatus, deleteTour, deleteAll, cheapTours, AggregateQuery
 }
 
 // reset password functionality
