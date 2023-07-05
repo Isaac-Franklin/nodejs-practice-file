@@ -1,11 +1,11 @@
-const User = require('./../module/userModel')
-const jwt = require('jsonwebtoken')
-const {promisify} = require('util')
+import User from './../module/userModel.js'
+import jwt from 'jsonwebtoken'
+import promisify from 'util'
 // const resetToken = require('./')
-const fs = require('fs')
+import fs from'fs'
 
 // SAVE RANDOM USER TO DB
-exports.saveRandomUser = async(req, res) => {
+const saveRandomUser = async(req, res) => {
     try{
         const fileData = fs.readFile(`${__dirname}/../dev-data/data/users copy.json`, 'utf-8', async (err, data) => {
             if (err) throw new Error(err.message);
@@ -28,16 +28,17 @@ exports.saveRandomUser = async(req, res) => {
 }
 
 
-
-
-exports.secretKey = 'This sis my secret key data value';
-const secret_key = 'This sis my secret key data value';
+const secretKey = () => {
+    return 'This sis my secret key data value';
+} 
+const secretKeyHere = 'This sis my secret key data value';
 
 const secretToken = (id) => {
-    return jwt.sign({id}, secret_key, {
+    return jwt.sign({id}, secretKeyHere, {
         expiresIn: "1200s"
         })
 }
+
 
 // CREATING AND SENDING TOKEN IN COOKIE
 const createAndSendToken = (id, statusCode, res) => {
@@ -52,16 +53,14 @@ const createAndSendToken = (id, statusCode, res) => {
         res.cookie('jwt', token, CookieOption)
         return token;
    } catch (err) {
-    res.status(500).json({
+    res.status(statusCode).json({
         message: err.message
     })
    }
 }
 
-exports.userSignup = async (req, res) => {
-    try {
-        // const token = secretToken(newUser._id)
-        
+const userSignup = async (req, res) => {
+    try {      
         const newUser = await User.create({
             name: req.body.name,
             email: req.body.email,
@@ -113,7 +112,7 @@ class userStrings {
     }
 }
 
-exports.getUsers = async (req, res) => {
+const getUsers = async (req, res) => {
     try{
         const queryFeatures = new userStrings(User.find(), req.query).field()
         const queryInfo = await queryFeatures.query
@@ -132,8 +131,7 @@ exports.getUsers = async (req, res) => {
 }
 
 
-
-exports.login = (async (req, res) => {
+const login = (async (req, res) => {
     try{
         const { email, password } = req.body;
         if(!email || !password) {
@@ -143,17 +141,13 @@ exports.login = (async (req, res) => {
         if (!user || !(await user.checkPassword(password, user.password))){
             throw new Error('Please Provide correct email and password!')
         }
-        // console.log(user)
-        // const token = secretToken(user._id);
         const token = createAndSendToken(user._id, 201, res)
-        // console.log(token)
         res.status(200).json({
             status: 'Success!',
             token,
             message: 'Account logged in!'
         })
         req.user = user;
-        // console.log(`see it here ${req.user}`)
     } catch (err){
         res.status(400).json({
             status: 'failed!',
@@ -163,7 +157,7 @@ exports.login = (async (req, res) => {
 })
 
 // RESET PASSWORD
-exports.resetPasswordRequest = async (req, res) => {
+const resetPasswordRequest = async (req, res) => {
     try{
         const user = await User.findOne({ email: req.body.email})
         if(!user) throw new Error('Email Does Not Exit!')
@@ -197,7 +191,7 @@ exports.resetPasswordRequest = async (req, res) => {
     }
 }
 
-exports.passwordReset = async(req, res) => {
+const passwordReset = async(req, res) => {
     try{ 
         const token = req.params.token;
         const decodedToken = crypto.createHash('sha256').update(token).digest('hex')
@@ -217,10 +211,11 @@ exports.passwordReset = async(req, res) => {
     }
 }
 
-exports.userResetPassword = async(req, res) => {
+
+const userResetPassword = async(req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedUser = await promisify(jwt.verify)(token, secret_key)
+        const decodedUser = await promisify(jwt.verify)(token, secretKeyHere)
         // console.log(decodedUser.id)
 
         const user = await User.findById(decodedUser.id).select('+password')
@@ -244,7 +239,7 @@ exports.userResetPassword = async(req, res) => {
     }
 }
 
-exports.deleteAcct = async (req, res) => {
+const deleteAcct = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user.id, {active: false})
     console.log(user)
     res.status(200).json({
@@ -253,4 +248,24 @@ exports.deleteAcct = async (req, res) => {
 }
 
 
+const viewUser = async(req, res) => {
+    try{
+        const queryFeatures = new userStrings(User.find(), req.query).field()
+        const queryInfo = await queryFeatures.query
+        let allUsers = await queryInfo
+        res.status(200).json({
+            status: 'ok',
+            response: allUsers.length,
+            data: allUsers
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: 'failed!',
+            message: err.message
+        })
+    }
+}
 
+export default {
+    saveRandomUser, secretKey, userSignup, getUsers, login, resetPasswordRequest, passwordReset, userResetPassword, deleteAcct, viewUser
+}

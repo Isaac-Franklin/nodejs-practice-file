@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
+import tourController from '../controller/tourController.js'
 const tourRounter = express.Router();
-const tourController = require('../controller/tourController')
 
 // tourRounter.route('/').post(tourController.createTour)
 
@@ -17,8 +17,7 @@ tourRounter.route('/')
         tourController.getTours
         )
     .post(
-        tourController.createTour
-        )
+        tourController.createTour)
     .delete(tourController.deleteAll)
 
 
@@ -28,9 +27,8 @@ tourRounter.route('/:id')
     .delete(
         tourController.VerifyUser, 
         tourController.VerifyUserStatus('admin', 'lead'),
-        tourController.deleteTour
-        )
+        tourController.deleteTour)
 
-module.exports = tourRounter
+export default tourRounter
 
 

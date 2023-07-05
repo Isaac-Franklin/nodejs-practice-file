@@ -1,0 +1,85 @@
+include base
+
+mixin overview(a, b, c)
+    .overview-box__detail   
+        svg.overview-box__icon 
+            use(xlink:href=`/img/icons.svg#icon-${a}`)
+        span.overview-box__label= b
+        span.overview-box__text= c
+
+block content
+    body
+        section.section-header
+            .header__hero
+                .header__hero-overlay &nbsp;
+                img.header__hero-img(src=`/img/tours/${mainTour.imageCover}` , alt=`${mainTour.name}`)
+            .heading-box
+                h1.heading-primary
+                    span= mainTour.name
+                .heading-box__group
+                    .heading-box__detail
+                        svg.heading-box__icon
+                            use(xlink:href='/img/icons.svg#icon-clock')
+                        span.heading-box__text= mainTour.duration
+                    .heading-box__detail
+                        svg.heading-box__icon
+                            use(xlink:href='/img/icons.svg#icon-map-pin')
+                        span.heading-box__text= mainTour.startLocation.description
+
+        section.section-description 
+            .overview-box
+                div
+                    .overview-box__group 
+                        h2.heading-secondary.ma-bt-lg Quick facts
+
+                        //- - const date = mainTour.startDates[0]toLocaleString('en-us', {month: 'long', year: 'numeric'})
+                        //- - const date = tour.startDates[0].toLocaleString('en-us', {month: 'long', year: 'numeric'})
+                        +overview('calendar', 'Next date', 'August 2021')
+
+                        +overview('trending-up', 'Difficulty', 'Medium')
+
+                        +overview('user', 'Participants', '10 People')
+
+                        +overview('star', 'Rating', '4.9 / 5')                        
+                    .overview-box__group
+                        h2.heading-secondary.ma-bt-lg Your tour guides
+                        each guide in mainTour.guides
+                            .overview-box__detail
+                                img.overview-box__img(src=`/img/users/${guide.photo}` alt=`${guide.name}`)
+                                span.overview-box__label= `${guide.role}`
+                                span.overview-box__text= `${guide.name}`
+
+                        //- .overview-box__detail
+                        //-     img.overview-box__img(src="/img/users/user-18.jpg" alt="Tour guide")
+                        //-     span.overview-box__label Tour guide 
+                        //-     span.overview-box__text Lisa Brown
+                        //- .overview-box__detail
+                        //-     img(src="/img/users/user-17.jpg" alt="Intern" class="overview-box__img")
+                        //-     span.overview-box__label Intern
+                        //-     span.overview-box__text Max Smith
+
+
+            .description-box
+                h2.heading-secondary.ma-bt-lg About the park camper tour
+                p.description__text                
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+                    minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea commodo consequat. Duis aute irure dolor in
+                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                    pariatur.
+                p.description__text                
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+                    minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea commodo consequat. Duis aute irure dolor in
+                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                    pariatur.
+        section.section-pictures 
+            .picture-box 
+                img.picture-box__img.picture-box__img--1(src="/img/tour-5-1.jpg" alt="The Park Camper Tour 1")
+            .picture-box
+                img.picture-box__img.picture-box__img--2(src="/img/tour-5-2.jpg" alt="The Park Camper Tour 1")
+            .picture-box
+                img.picture-box__img.picture-box__img--3(src="/img/tour-5-3.jpg" alt="The Park Camper Tour 1")
+

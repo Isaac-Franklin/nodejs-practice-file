@@ -1,4 +1,5 @@
-const dotenv = require("dotenv")
+import dotenv from "dotenv"
+import app from "./index.js"
 // const mongoose = require("mongoose")
 // const DB = 'mongodb+srv://franklin:12345@cluster0.dm5l9rl.mongodb.net/?retryWrites=true&w=majority'
 // // const DB = 'mongodb+srv://franklin:12345@cluster0.dm5l9rl.mongodb.net/?retryWrites=true&w=majority'
@@ -52,12 +53,13 @@ const dotenv = require("dotenv")
 dotenv.config({
     path: './config.env'
 })
-const app = require("./index")
+
 
 // console.log(process.env)
 // console.log(app.get('env'))
 
-const port = 5000;
+const port = 3000;
 app.listen(port, () => {
     console.log("API currently running...")
 })
+

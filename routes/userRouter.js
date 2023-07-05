@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express'
 const userRoutes = express.Router();
-const userAuth = require('./../controller/userAuthController')
-const tourController = require('../controller/tourController')
+import userAuth from './../controller/userAuthController.js'
+import tourController from '../controller/tourController.js'
 
-
+userRoutes.route('/viewusers').get(userAuth.viewUser)
 userRoutes.route('/').post(userAuth.userSignup).get(userAuth.getUsers)
 userRoutes.route('/login').post(userAuth.login)
 userRoutes.route('/resetpassword').patch(userAuth.resetPasswordRequest)
@@ -14,5 +14,5 @@ userRoutes.route('/deleteAccount').delete(tourController.VerifyUser, userAuth.de
 // activate save random users to db
 userRoutes.route('/saverandomusers').post(userAuth.saveRandomUser)
 
-module.exports = userRoutes
+export default userRoutes
 
